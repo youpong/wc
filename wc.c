@@ -11,6 +11,8 @@ int main(int argc, char **argv) {
 
   int c;
   while ((c = fgetc(stdin)) != EOF) {
+    if (c == '\n')
+      nlines++;
     nbytes++;
   }
 
