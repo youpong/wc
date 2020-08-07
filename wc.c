@@ -21,6 +21,16 @@ typedef struct {
   char *path;
 } WC;
 
+static int log10i(int x) {
+  int log = 0;
+  
+  for (;x >= 10; log++) {
+    x /= 10;
+  }
+  
+  return log;
+}
+
 static bool is_dir(char *path) {
   bool ret;
 
@@ -49,7 +59,7 @@ static FILE *open_file(char *path) {
 static char *gen_fmt(int nbytes) {
   char *ret = calloc(sizeof(char), 15 + 1);
 
-  int n = log10(nbytes) + 1;
+  int n = log10i(nbytes) + 1;
   sprintf(ret, "%%%dd %%%dd %%%dd %%s\n", n, n, n);
 
   return ret;
@@ -71,6 +81,7 @@ static WC *new_wc(int nlines, int nwords, int nbytes, char *path) {
 }
 
 static WC *wc(FILE *f, char *path) {
+  char *white_space = " \t\v\n";
   int nlines = 0;
   int nwords = 0;
   int nbytes = 0;
@@ -78,24 +89,20 @@ static WC *wc(FILE *f, char *path) {
 
   int c;
   while ((c = fgetc(f)) != EOF) {
+    nbytes++;
+
     if (c == '\n')
       nlines++;
 
-    switch (c) {
-    case ' ':
-    case '\t':
-    case '\v':
-    case '\n':
+    if (strchr(white_space, c) != NULL) {
       in_word = false;
-      break;
-    default:
-      if (in_word == false) {
-        in_word = true;
-        nwords++;
-      }
+      continue;
     }
 
-    nbytes++;
+    if (in_word == false) {
+      in_word = true;
+      nwords++;
+    }
   }
 
   return new_wc(nlines, nwords, nbytes, path);
