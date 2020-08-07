@@ -1,7 +1,5 @@
-# for GNU make
 CC = gcc
 CFLAGS = -g -Wall
-LDLIBS = -lm
 
 TARGET = wc
 .PHONY: all clean format check
