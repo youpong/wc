@@ -5,7 +5,7 @@
 // printf("%3d %3d %3d %s\n", 17, 32, 180, "Makefile");
 // printf("%3d %3d %3d %s\n", 20, 35, 190, "total");
 
-int main(int argc, char **argv) {
+static void wc() {
   int nlines = 0;
   int nwords = 0;
   int nbytes = 0;
@@ -34,6 +34,9 @@ int main(int argc, char **argv) {
   }
 
   printf("%7d %7d %7d\n", nlines, nwords, nbytes);
+}
 
+int main(int argc, char **argv) {
+  wc();
   return 0;
 }
