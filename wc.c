@@ -6,6 +6,13 @@ int total_nlines = 0;
 int total_nwords = 0;
 int total_nbytes = 0;
 
+typedef struct {
+  int nlines;
+  int nwords;
+  int nbytes;
+  char *path;
+} WC;
+
 static int digit_num(int nbytes) {
   int num = 0;
 
@@ -24,7 +31,18 @@ static char *gen_fmt(int nbytes) {
   return ret;
 }
 
-static void wc(FILE *f, char *path) {
+static WC *new_wc(int nlines, int nwords, int nbytes, char *path) {
+  WC *wc = malloc(sizeof(WC));
+
+  wc->nlines = nlines;
+  wc->nwords = nwords;
+  wc->nbytes = nbytes;
+  wc->path = path;
+
+  return wc;
+}
+
+static WC *wc(FILE *f, char *path) {
   int nlines = 0;
   int nwords = 0;
   int nbytes = 0;
@@ -52,15 +70,20 @@ static void wc(FILE *f, char *path) {
     nbytes++;
   }
 
+  // TODO: refactor
   total_nlines += nlines;
   total_nwords += nwords;
   total_nbytes += nbytes;
 
-  if (path != NULL) {
-    char *fmt = gen_fmt(nbytes);
-    printf(fmt, nlines, nwords, nbytes, path);
+  return new_wc(nlines, nwords, nbytes, path);
+}
+
+static void print_wc(WC *wc) {
+  if (wc->path != NULL) {
+    char *fmt = gen_fmt(wc->nbytes);
+    printf(fmt, wc->nlines, wc->nwords, wc->nbytes, wc->path);
   } else {
-    printf("%7d %7d %7d\n", nlines, nwords, nbytes);
+    printf("%7d %7d %7d\n", wc->nlines, wc->nwords, wc->nbytes);
   }
 }
 
@@ -68,14 +91,16 @@ int main(int argc, char **argv) {
   char **args = argv + 1;
 
   if (argc == 1) {
-    wc(stdin, NULL);
+    WC *w = wc(stdin, NULL);
+    print_wc(w);
     return 0;
   }
 
   for (char **p = args; *p != NULL; p++) {
     FILE *f = fopen(*p, "r");
 
-    wc(f, *p);
+    WC *w = wc(f, *p);
+    print_wc(w);
     fclose(f);
   }
 
