@@ -5,6 +5,10 @@
 // printf("%3d %3d %3d %s\n", 17, 32, 180, "Makefile");
 // printf("%3d %3d %3d %s\n", 20, 35, 190, "total");
 
+int total_nlines = 0;
+int total_nwords = 0;
+int total_nbytes = 0;
+
 static void wc(FILE *f, char *path) {
   int nlines = 0;
   int nwords = 0;
@@ -33,6 +37,10 @@ static void wc(FILE *f, char *path) {
     nbytes++;
   }
 
+  total_nlines += nlines;
+  total_nwords += nwords;
+  total_nbytes += nbytes;
+
   if (path != NULL) {
     printf("%4d %4d %4d %s\n", nlines, nwords, nbytes, path);
   } else {
@@ -53,6 +61,11 @@ int main(int argc, char **argv) {
 
     wc(f, *p);
     fclose(f);
+  }
+
+  if (argc >= 3) {
+    printf("%4d %4d %4d %s\n", total_nlines, total_nwords, total_nbytes,
+           "total");
   }
 
   return 0;
