@@ -1,4 +1,5 @@
 #include "util.h"
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,21 +15,12 @@ typedef struct {
   char *path;
 } WC;
 
-static int digit_num(int nbytes) {
-  int num = 0;
-
-  while (nbytes > 0) {
-    nbytes /= 10;
-    num++;
-  }
-
-  return num;
-}
-
 static char *gen_fmt(int nbytes) {
   char *ret = calloc(sizeof(char), 15 + 1);
-  int n = digit_num(nbytes);
+
+  int n = log10(nbytes) + 1;
   sprintf(ret, "%%%dd %%%dd %%%dd %%s\n", n, n, n);
+
   return ret;
 }
 
@@ -39,6 +31,10 @@ static WC *new_wc(int nlines, int nwords, int nbytes, char *path) {
   wc->nwords = nwords;
   wc->nbytes = nbytes;
   wc->path = path;
+
+  total_nlines += nlines;
+  total_nwords += nwords;
+  total_nbytes += nbytes;
 
   return wc;
 }
@@ -71,11 +67,6 @@ static WC *wc(FILE *f, char *path) {
     nbytes++;
   }
 
-  // TODO: refactor
-  total_nlines += nlines;
-  total_nwords += nwords;
-  total_nbytes += nbytes;
-
   return new_wc(nlines, nwords, nbytes, path);
 }
 
@@ -90,7 +81,6 @@ static void print_wc(WC *wc) {
 
 int main(int argc, char **argv) {
   Vector *wcs = new_vector();
-
   char **args = argv + 1;
 
   if (argc == 1) {
@@ -101,7 +91,7 @@ int main(int argc, char **argv) {
 
   for (char **p = args; *p != NULL; p++) {
     FILE *f = fopen(*p, "r");
-
+    // TODO: error handling
     vec_push(wcs, wc(f, *p));
 
     fclose(f);
