@@ -1,8 +1,14 @@
 #include "util.h"
+#include <dirent.h>
+#include <errno.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+
+char *progname;
 
 int total_nlines = 0;
 int total_nwords = 0;
@@ -14,6 +20,31 @@ typedef struct {
   int nbytes;
   char *path;
 } WC;
+
+static bool is_dir(char *path) {
+  bool ret;
+
+  DIR *dir = opendir(path);
+  ret = dir != NULL ? true : false;
+  closedir(dir);
+
+  return ret;
+}
+
+static FILE *open_file(char *path) {
+  if (is_dir(path)) {
+    fprintf(stderr, "%s: %s: is directory\n", progname, path);
+    return NULL;
+  }
+
+  FILE *f = fopen(path, "r");
+  if (f == NULL) {
+    fprintf(stderr, "%s: %s: %s\n", progname, path, strerror(errno));
+    return NULL;
+  }
+
+  return f;
+}
 
 static char *gen_fmt(int nbytes) {
   char *ret = calloc(sizeof(char), 15 + 1);
@@ -82,6 +113,9 @@ static void print_wc(WC *wc) {
 int main(int argc, char **argv) {
   Vector *wcs = new_vector();
   char **args = argv + 1;
+  int ret = EXIT_SUCCESS;
+
+  progname = argv[0];
 
   if (argc == 1) {
     WC *w = wc(stdin, NULL);
@@ -90,8 +124,11 @@ int main(int argc, char **argv) {
   }
 
   for (char **p = args; *p != NULL; p++) {
-    FILE *f = fopen(*p, "r");
-    // TODO: error handling
+    FILE *f = open_file(*p);
+    if (f == NULL) {
+      ret = EXIT_FAILURE;
+      continue;
+    }
     vec_push(wcs, wc(f, *p));
 
     fclose(f);
@@ -106,5 +143,5 @@ int main(int argc, char **argv) {
     printf(fmt, total_nlines, total_nwords, total_nbytes, "total");
   }
 
-  return 0;
+  return ret;
 }
