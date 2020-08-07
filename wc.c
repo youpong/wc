@@ -81,7 +81,7 @@ static WC *wc(FILE *f, char *path) {
 
 static void print_wc(WC *wc) {
   if (wc->path != NULL) {
-    char *fmt = gen_fmt(wc->nbytes);
+    char *fmt = gen_fmt(total_nbytes);
     printf(fmt, wc->nlines, wc->nwords, wc->nbytes, wc->path);
   } else {
     printf("%7d %7d %7d\n", wc->nlines, wc->nwords, wc->nbytes);
@@ -112,8 +112,8 @@ int main(int argc, char **argv) {
   }
 
   if (argc >= 3) {
-    printf("%4d %4d %4d %s\n", total_nlines, total_nwords, total_nbytes,
-           "total");
+    char *fmt = gen_fmt(total_nbytes);
+    printf(fmt, total_nlines, total_nwords, total_nbytes, "total");
   }
 
   return 0;
