@@ -1,13 +1,28 @@
 #include <stdbool.h>
 #include <stdio.h>
-
-// printf("%2d %2d %2d %s\n",  3,  3,  10, ".gitignore");
-// printf("%3d %3d %3d %s\n", 17, 32, 180, "Makefile");
-// printf("%3d %3d %3d %s\n", 20, 35, 190, "total");
+#include <stdlib.h>
 
 int total_nlines = 0;
 int total_nwords = 0;
 int total_nbytes = 0;
+
+static int digit_num(int nbytes) {
+  int num = 0;
+
+  while (nbytes > 0) {
+    nbytes /= 10;
+    num++;
+  }
+
+  return num;
+}
+
+static char *gen_fmt(int nbytes) {
+  char *ret = calloc(sizeof(char), 15 + 1);
+  int n = digit_num(nbytes);
+  sprintf(ret, "%%%dd %%%dd %%%dd %%s\n", n, n, n);
+  return ret;
+}
 
 static void wc(FILE *f, char *path) {
   int nlines = 0;
@@ -42,7 +57,8 @@ static void wc(FILE *f, char *path) {
   total_nbytes += nbytes;
 
   if (path != NULL) {
-    printf("%4d %4d %4d %s\n", nlines, nwords, nbytes, path);
+    char *fmt = gen_fmt(nbytes);
+    printf(fmt, nlines, nwords, nbytes, path);
   } else {
     printf("%7d %7d %7d\n", nlines, nwords, nbytes);
   }
