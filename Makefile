@@ -14,4 +14,6 @@ format:
 check: all
 	./test.sh
 
-wc: wc.o
+wc: wc.o util.o
+
+util.o: util.c util.h

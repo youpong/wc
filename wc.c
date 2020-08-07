@@ -1,3 +1,4 @@
+#include "util.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,6 +89,8 @@ static void print_wc(WC *wc) {
 }
 
 int main(int argc, char **argv) {
+  Vector *wcs = new_vector();
+
   char **args = argv + 1;
 
   if (argc == 1) {
@@ -99,9 +102,13 @@ int main(int argc, char **argv) {
   for (char **p = args; *p != NULL; p++) {
     FILE *f = fopen(*p, "r");
 
-    WC *w = wc(f, *p);
-    print_wc(w);
+    vec_push(wcs, wc(f, *p));
+
     fclose(f);
+  }
+
+  for (int i = 0; i < wcs->len; i++) {
+    print_wc(wcs->data[i]);
   }
 
   if (argc >= 3) {
