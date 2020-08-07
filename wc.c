@@ -111,17 +111,17 @@ static void print_wc(WC *wc) {
 }
 
 int main(int argc, char **argv) {
-  Vector *wcs = new_vector();
   char **args = argv + 1;
   int ret = EXIT_SUCCESS;
 
   progname = argv[0];
 
   if (argc == 1) {
-    WC *w = wc(stdin, NULL);
-    print_wc(w);
+    print_wc(wc(stdin, NULL));
     return 0;
   }
+
+  Vector *vec = new_vector();
 
   for (char **p = args; *p != NULL; p++) {
     FILE *f = open_file(*p);
@@ -129,13 +129,13 @@ int main(int argc, char **argv) {
       ret = EXIT_FAILURE;
       continue;
     }
-    vec_push(wcs, wc(f, *p));
+    vec_push(vec, wc(f, *p));
 
     fclose(f);
   }
 
-  for (int i = 0; i < wcs->len; i++) {
-    print_wc(wcs->data[i]);
+  for (int i = 0; i < vec->len; i++) {
+    print_wc(vec->data[i]);
   }
 
   if (argc >= 3) {
