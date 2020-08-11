@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -std=c17
+CFLAGS = -g -Wall -std=c18
 
 TARGET = wc
 .PHONY: all clean format check

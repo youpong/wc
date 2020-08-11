@@ -23,11 +23,11 @@ typedef struct {
 
 static int log10i(int x) {
   int log = 0;
-  
-  for (;x >= 10; log++) {
+
+  for (; x >= 10; log++) {
     x /= 10;
   }
-  
+
   return log;
 }
 
@@ -81,7 +81,8 @@ static WC *new_wc(int nlines, int nwords, int nbytes, char *path) {
 }
 
 static WC *wc(FILE *f, char *path) {
-  char *white_space = " \t\v\n";
+  /** white-space characters in locale "C" and "POSIX" */
+  char *white_space = " \f\n\r\v\t";
   int nlines = 0;
   int nwords = 0;
   int nbytes = 0;
